@@ -17,10 +17,6 @@ if(isset($_POST['submit'])) {
 
     $to = "kirilv1984@gmail.com";
     $message = "";
-    $crust = $_POST["selectedCrust"];
-    $topping = $_POST["selectedTopping"];
-    $drink = $_POST["selectedDrink"];
-    $grandTotal = $_POST["grandTotal"];
     $subject = "New Order " . strftime("%T", time());
     $message .= "Crust: $crust\n\r";
     $message .= "Topping: $topping\n\r";

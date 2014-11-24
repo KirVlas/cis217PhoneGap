@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Pizza Place</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+</head>
+<body>
+
+<div data-role="page" id="homePage" data-theme="b">
+    <div data-role="header" data-id="navbar" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#homePage" class="ui-btn-active ui-state-persist">Home</a></li>
+                <li><a href="#callPage">CALL US</a></li>
+                <li><a href="#menuPage">Menu</a></li>
+                <li><a href="#orderPage">Order</a></li>
+                <li><a href="#locationPage">Location</a></li>
+                <li><a href="#aboutPage">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <img src="img/pizza_place1.jpg" alt="chef" class="home-img">
+
+    <div data-role="footer" class="footer" data-position="fixed">
+        <span>&copy;Copyright Kirill Vlasenko 2014</span>
+    </div>
+</div>
+
+<div data-role="page" id="callPage" data-theme="b">
+    <div data-role="header" data-id="navbar" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#homePage">Home</a></li>
+                <li><a href="#callPage" class="ui-btn-active ui-state-persist">CALL US</a></li>
+                <li><a href="#menuPage">Menu</a></li>
+                <li><a href="#orderPage">Order</a></li>
+                <li><a href="#locationPage">Location</a></li>
+                <li><a href="#aboutPage">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <a href="tel:111-111-1111" data-role="button" class="phone-number">Give us a call</a>
+
+
+    <div data-role="footer" class="footer" data-position="fixed">
+        <span>&copy;Copyright Kirill Vlasenko 2014</span>
+    </div>
+</div>
+
+<div data-role="page" id="menuPage" data-theme="b">
+    <div data-role="header" data-id="navbar" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#homePage">Home</a></li>
+                <li><a href="#callPage">CALL US</a></li>
+                <li><a href="#menuPage" class="ui-btn-active ui-state-persist">Menu</a></li>
+                <li><a href="#orderPage">Order</a></li>
+                <li><a href="#locationPage">Location</a></li>
+                <li><a href="#aboutPage">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content">
+        <form action="mail.php" method="post">
+            <label for="crust">Select Crust: </label>
+            <select data-product="crust" name="crust" id="crust">
+                <option>No Crust Selected</option>
+                <option value="Thin" data-price="10.99">Thin</option>
+                <option value="Stuffed" data-price="12.99">Stuffed</option>
+            </select>
+            <label for="topping">Select Topping: </label>
+            <select data-product="topping" name="topping" id="topping">
+                <option>No Topping Selected</option>
+                <option value="Mushrooms" data-price="1.99">Mushrooms</option>
+                <option value="Olives" data-price="1.59">Olives</option>
+                <option value="Pineapple" data-price="1.79">Pineapple</option>
+            </select>
+            <label for="drink">Select Drink: </label>
+            <select data-product="drink" name="drink" id="drink">
+                <option>No Drink Selected</option>
+                <option value="Coke" data-price="1.99">Coca-Cola</option>
+                <option value="Pepsi" data-price="1.99">Pepsi</option>
+                <option value="Iced Tea" data-price="2.49">Iced Tea</option>
+            </select>
+            <input type="email" name="email" id="email" placeholder="Enter your email">
+            <input type="submit" value="Submit Order" name="submit" id="buy">
+            <input type="text" name="selectedCrust" id="selectedCrust" readonly>
+            <input type="text" name="selectedTopping" id="selectedTopping" readonly>
+            <input type="text" name="selectedDrink" id="selectedDrink" readonly>
+            <input type="text" name="grandTotal" id="grandTotal" readonly>
+        </form>
+        <button id="display">Display Cart</button>
+    </div>
+
+
+    <script>
+        var grandTotal = 0;
+        function displayCart(){
+            grandTotal = 0;
+            var cartDiv = $("#cartDiv");
+            cartDiv.html("");
+            for(var item in cart) {
+                var name = cart[item].name;
+                var price = cart[item].price;
+                if (cart[item].name == "Thin" || cart[item].name == "Stuffed")
+                $("#selectedCrust").val(name + ' --- $' + price.toFixed(2));
+                else if (cart[item].name == "Mushrooms" || cart[item].name == "Olives" || cart[item].name == "Pineapple")
+                $("#selectedTopping").val(name + ' --- $' + price.toFixed(2));
+                else if (cart[item].name == "Coke" || cart[item].name == "Pepsi" || cart[item].name == "Iced Tea")
+                $("#selectedDrink").val(name + ' --- $' + price.toFixed(2));
+                grandTotal += price;
+            }
+            $("#grandTotal").val('Grand Total: $' + grandTotal);
+        }
+        var cart = {};
+        $(document).ready(function() {
+            $("#crust").change(function(event) {
+                var product = $("#crust").data("product");
+                cart[product] = new Object();
+                cart[product].name = $("#crust option:selected").val();
+                cart[product].price = $("#crust option:selected").data("price");
+            });
+
+
+            $("#topping").change(function(event) {
+                var product = $("#topping").data("product");
+                cart[product] = new Object();
+                cart[product].name = $("#topping option:selected").val();
+                cart[product].price = $("#topping option:selected").data("price");
+
+            });
+
+            $("#drink").change(function(event) {
+                var product = $("#drink").data("product");
+                cart[product] = new Object();
+                cart[product].name = $("#drink option:selected").val();
+                cart[product].price = $("#drink option:selected").data("price");
+
+            });
+            $("#display" ).on('click', function() {
+                displayCart();
+            });
+
+            $("#saveOrder").on("click", function (){
+
+                localStorage['cart'] = JSON.stringify(cart);
+            });
+
+            $("#loadOrder").on("click", function(){
+                var obj = JSON.parse(localStorage['cart']);
+                cart = obj;
+            });
+
+        });
+    </script>
+    <div data-role="footer" class="footer" data-position="fixed">
+        <span>&copy;Copyright Kirill Vlasenko 2014</span>
+    </div>
+</div>
+
+<div data-role="page" id="orderPage" data-theme="b">
+    <div data-role="header" data-id="navbar" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#homePage">Home</a></li>
+                <li><a href="#callPage">CALL US</a></li>
+                <li><a href="#menuPage">Menu</a></li>
+                <li><a href="#orderPage" class="ui-btn-active ui-state-persist">Order</a></li>
+                <li><a href="#locationPage">Location</a></li>
+                <li><a href="#aboutPage">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content">
+        <button id="saveOrder">Save Order</button>
+        <button id="loadOrder">Load Order</button>
+
+    </div>
+
+    <div data-role="footer" class="footer" data-position="fixed">
+        <span>&copy;Copyright Kirill Vlasenko 2014</span>
+    </div>
+</div>
+
+<div data-role="page" id="locationPage" data-theme="b">
+    <div data-role="header" data-id="navbar" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#homePage">Home</a></li>
+                <li><a href="#callPage">CALL US</a></li>
+                <li><a href="#menuPage">Menu</a></li>
+                <li><a href="#orderPage">Order</a></li>
+                <li><a href="#locationPage" class="ui-btn-active ui-state-persist">Location</a></li>
+                <li><a href="#aboutPage">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        $(document).on("pageinit", "#locationPage", function () {
+            initialize();
+            if (navigator.geolocation) {
+                function success(pos) {
+                    $("#myloc").val(pos.coords.latitude + "," + pos.coords.longitude);
+                    calcRoute();
+                }
+
+                function fail(error) {
+                    $("#myloc").val("Spokane, WA");
+                    alert("Couldn't get your location. Are your location services enabled?");
+                    calcRoute();
+                }
+
+                navigator.geolocation.getCurrentPosition(success, fail, {
+                    maximumAge: 500000,
+                    enableHighAccuracy: true,
+                    timeout: 6000
+                });
+            }
+        });
+        $(document).on('click', '#directions', function (e) {
+            e.preventDefault();
+            calcRoute();
+        });
+
+        var directionsDisplay;
+        var directionsService = new google.maps.DirectionsService();
+        var map;
+        function initialize() {
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            var pizzaPlace = new google.maps.LatLng(47.6728404, -117.4121499);
+            var mapOptions = {
+                zoom: 10,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                center: pizzaPlace
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            directionsDisplay.setMap(map);
+        }
+
+        function calcRoute() {
+            var start = $('#myloc').val();
+            var end = "47.6728404, -117.4121499";
+            var request = {
+                origin: start,
+                destination: end,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });
+        }
+    </script>
+    <div id="map-canvas"></div>
+    <form>
+        <input type="text" name="myloc" id="myloc">
+        <a href="#" data-role="button" id="directions">Get Directions</a>
+    </form>
+    <div data-role="footer" class="footer" data-position="fixed">
+        <span>&copy;Copyright Kirill Vlasenko 2014</span>
+    </div>
+</div>
+<div data-role="page" id="aboutPage" data-theme="b">
+    <div data-role="header" data-id="navbar" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#homePage">Home</a></li>
+                <li><a href="#callPage">CALL US</a></li>
+                <li><a href="#menuPage">Menu</a></li>
+                <li><a href="#orderPage">Order</a></li>
+                <li><a href="#locationPage">Location</a></li>
+                <li><a href="#aboutPage" class="ui-btn-active ui-state-persist">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content">
+        <h3 class="about_us">About Us</h3>
+        <p>
+            At The Pizza Place, we prepare and serve a traditional Naples style pizza. We use the freshest ingredients imported from Italy. We carry a large selection of craft beer and wine. We hope you enjoy your experience at The Pizza Place and look forward to serving you again!
+        </p>
+    </div>
+    <div data-role="footer" class="footer" data-position="fixed">
+        <span>&copy;Copyright Kirill Vlasenko 2014</span>
+    </div>
+</div>
+
+</body>
+</html>

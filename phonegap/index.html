@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <script src="js/cordova.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova_plugins.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 </head>
 <body>
@@ -26,13 +27,6 @@
             </ul>
         </div>
     </div>
-    <script>
-        document.addEventListener("deviceready", onDeviceReady, false);
-
-        function onDeviceReady() {
-            navigator.notification.alert("Device Ready", null, "Info", "OK");
-        }
-    </script>
     <img src="img/pizza_place1.jpg" alt="chef" class="home-img">
 
     <div data-role="footer" class="footer" data-position="fixed">
@@ -109,7 +103,6 @@
 
 
     <script>
-
         var grandTotal = 0;
         function displayCart() {
             grandTotal = 0;
@@ -154,8 +147,13 @@
             addProduct("#drink");
             $("#display").on('click', function () {
                 displayCart();
+                showAlert();
             });
         });
+
+        function showAlert() {
+            navigator.notification.alert("Test", null, "hello", "ok");
+        };
 
         $(document).on('pageshow', '#menuPage', function (){
             if(cart){

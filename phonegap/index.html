@@ -26,6 +26,13 @@
             </ul>
         </div>
     </div>
+    <script>
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        function onDeviceReady() {
+            navigator.notification.alert("Device Ready", null, "Info", "OK");
+        }
+    </script>
     <img src="img/pizza_place1.jpg" alt="chef" class="home-img">
 
     <div data-role="footer" class="footer" data-position="fixed">
@@ -102,6 +109,7 @@
 
 
     <script>
+
         var grandTotal = 0;
         function displayCart() {
             grandTotal = 0;
@@ -125,13 +133,10 @@
                 alert("Email must not be empty!");
                 return false;
             } else {
-                ShowAlert();
+                alert("Order Submitted!");
             }
         }
 
-        function ShowAlert(){
-            navigator.notification.alert("You've submitted your order!", null, "Thank You!", "OK");
-        };
 
         function addProduct(prod) {
             $(prod).change(function () {

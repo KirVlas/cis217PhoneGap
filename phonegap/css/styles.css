@@ -22,6 +22,8 @@
 }
 
 #map-canvas {
+    width: 100%;
+    height: 90%;
     padding: 0;
     position : absolute !important;
     top : 40px !important;
@@ -31,6 +33,9 @@
     margin-top: 10em;
 }
 
-.about_us, #cartDiv {
+.about_us, .order-info {
     text-align: center;
 }
+
+
+

@@ -2,12 +2,13 @@
 <html>
 <head>
     <title>The Pizza Place</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
     <link rel="stylesheet" href="css/styles.css">
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="js/cordova.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 </head>
 <body>
@@ -68,7 +69,7 @@
         </div>
     </div>
     <div data-role="content">
-        <form action="mail.php" method="post">
+        <form action="mail.php" onsubmit="return checkEmpty()" method="post">
             <label for="crust">Select Crust: </label>
             <select data-product="crust" name="crust" id="crust">
                 <option>No Crust Selected</option>
@@ -102,62 +103,67 @@
 
     <script>
         var grandTotal = 0;
-        function displayCart(){
+        function displayCart() {
             grandTotal = 0;
-            var cartDiv = $("#cartDiv");
-            cartDiv.html("");
-            for(var item in cart) {
+            for (var item in cart) {
                 var name = cart[item].name;
                 var price = cart[item].price;
                 if (cart[item].name == "Thin" || cart[item].name == "Stuffed")
-                $("#selectedCrust").val(name + ' --- $' + price.toFixed(2));
+                    $("#selectedCrust").val(name + ' --- $' + price);
                 else if (cart[item].name == "Mushrooms" || cart[item].name == "Olives" || cart[item].name == "Pineapple")
-                $("#selectedTopping").val(name + ' --- $' + price.toFixed(2));
+                    $("#selectedTopping").val(name + ' --- $' + price);
                 else if (cart[item].name == "Coke" || cart[item].name == "Pepsi" || cart[item].name == "Iced Tea")
-                $("#selectedDrink").val(name + ' --- $' + price.toFixed(2));
+                    $("#selectedDrink").val(name + ' --- $' + price);
                 grandTotal += price;
             }
-            $("#grandTotal").val('Grand Total: $' + grandTotal);
+
+            $("#grandTotal").val('Grand Total: $' + grandTotal.toFixed(2));
         }
+
+        function checkEmpty() {
+            if ($("#email").val() == "") {
+                alert("Email must not be empty!");
+                return false;
+            } else {
+                ShowAlert();
+            }
+        }
+
+        function ShowAlert(){
+            navigator.notification.alert("You've submitted your order!", null, "Thank You!", "OK");
+        };
+
+        function addProduct(prod) {
+            $(prod).change(function () {
+                var product = $(prod).data("product");
+                cart[product] = new Object();
+                cart[product].name = $(prod + " option:selected").val();
+                cart[product].price = $(prod + " option:selected").data("price");
+            });
+        }
+
         var cart = {};
-        $(document).ready(function() {
-            $("#crust").change(function(event) {
-                var product = $("#crust").data("product");
-                cart[product] = new Object();
-                cart[product].name = $("#crust option:selected").val();
-                cart[product].price = $("#crust option:selected").data("price");
-            });
-
-
-            $("#topping").change(function(event) {
-                var product = $("#topping").data("product");
-                cart[product] = new Object();
-                cart[product].name = $("#topping option:selected").val();
-                cart[product].price = $("#topping option:selected").data("price");
-
-            });
-
-            $("#drink").change(function(event) {
-                var product = $("#drink").data("product");
-                cart[product] = new Object();
-                cart[product].name = $("#drink option:selected").val();
-                cart[product].price = $("#drink option:selected").data("price");
-
-            });
-            $("#display" ).on('click', function() {
+        $(document).on('pageinit', '#menuPage', function () {
+            addProduct("#crust");
+            addProduct("#topping");
+            addProduct("#drink");
+            $("#display").on('click', function () {
                 displayCart();
             });
+        });
 
-            $("#saveOrder").on("click", function (){
-
-                localStorage['cart'] = JSON.stringify(cart);
-            });
-
-            $("#loadOrder").on("click", function(){
-                var obj = JSON.parse(localStorage['cart']);
-                cart = obj;
-            });
-
+        $(document).on('pageshow', '#menuPage', function (){
+            if(cart){
+                if(cart['crust']) {
+                    $("#crust").val(cart['crust'].name).trigger('change');
+                }
+                if(cart['topping']){
+                    $("#topping").val(cart['topping'].name).trigger('change');
+                }
+                if(cart['drink']){
+                    $("#drink").val(cart['drink'].name).trigger('change');
+                }
+            }
         });
     </script>
     <div data-role="footer" class="footer" data-position="fixed">
@@ -181,9 +187,27 @@
     <div data-role="content">
         <button id="saveOrder">Save Order</button>
         <button id="loadOrder">Load Order</button>
-
+        <p class="order-info"></p>
     </div>
+    <script>
+        $(document).on('pageinit', '#orderPage', function () {
+            $("#saveOrder").on("click", function () {
 
+                localStorage['cart'] = JSON.stringify(cart);
+                $(".order-info").html("Order saved!");
+            });
+
+            $("#loadOrder").on("click", function () {
+                if (localStorage['cart']) {
+                    var obj = JSON.parse(localStorage['cart']);
+                    cart = obj;
+                    $(".order-info").html("Order loaded!<br/><br/>Crust: " + cart['crust'].name + "<br/>Topping: " + cart['topping'].name + "<br/>Drink: " + cart['drink'].name + "<br/><br/>Click 'Display Cart' in the Menu page to display order.");
+                } else {
+                    $(".order-info").html("You do not have any saved orders.");
+                }
+            });
+        });
+    </script>
     <div data-role="footer" class="footer" data-position="fixed">
         <span>&copy;Copyright Kirill Vlasenko 2014</span>
     </div>
@@ -203,7 +227,7 @@
         </div>
     </div>
     <script>
-        $(document).on("pageinit", "#locationPage", function () {
+        $(document).on("pageshow", "#locationPage", function () {
             initialize();
             if (navigator.geolocation) {
                 function success(pos) {
@@ -283,8 +307,11 @@
     </div>
     <div data-role="content">
         <h3 class="about_us">About Us</h3>
+
         <p>
-            At The Pizza Place, we prepare and serve a traditional Naples style pizza. We use the freshest ingredients imported from Italy. We carry a large selection of craft beer and wine. We hope you enjoy your experience at The Pizza Place and look forward to serving you again!
+            At The Pizza Place, we prepare and serve a traditional Naples style pizza. We use the freshest ingredients
+            imported from Italy. We carry a large selection of craft beer and wine. We hope you enjoy your experience at
+            The Pizza Place and look forward to serving you again!
         </p>
     </div>
     <div data-role="footer" class="footer" data-position="fixed">

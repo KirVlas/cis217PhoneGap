@@ -70,7 +70,7 @@
         </div>
     </div>
     <div data-role="content">
-        <form action="mail.php" onsubmit="return checkEmpty()" method="post">
+        <form action="/" method="post" id="orderForm">
             <label for="crust">Select Crust: </label>
             <select data-product="crust" name="crust" id="crust">
                 <option>No Crust Selected</option>
@@ -109,25 +109,16 @@
             for (var item in cart) {
                 var name = cart[item].name;
                 var price = cart[item].price;
-                if (cart[item].name == "Thin" || cart[item].name == "Stuffed")
+                if (name == "Thin" || name == "Stuffed")
                     $("#selectedCrust").val(name + ' --- $' + price);
-                else if (cart[item].name == "Mushrooms" || cart[item].name == "Olives" || cart[item].name == "Pineapple")
+                else if (name == "Mushrooms" || name == "Olives" || name == "Pineapple")
                     $("#selectedTopping").val(name + ' --- $' + price);
-                else if (cart[item].name == "Coke" || cart[item].name == "Pepsi" || cart[item].name == "Iced Tea")
+                else if (name == "Coke" || name == "Pepsi" || name == "Iced Tea")
                     $("#selectedDrink").val(name + ' --- $' + price);
                 grandTotal += price;
             }
 
             $("#grandTotal").val('Grand Total: $' + grandTotal.toFixed(2));
-        }
-
-        function checkEmpty() {
-            if ($("#email").val() == "") {
-                alert("Email must not be empty!");
-                return false;
-            } else {
-                alert("Order Submitted!");
-            }
         }
 
 
@@ -147,13 +138,25 @@
             addProduct("#drink");
             $("#display").on('click', function () {
                 displayCart();
-                showAlert();
+            });
+
+            $("#orderForm").submit(function(e) {
+                var email = $("#email").val();
+                var crust = $("#selectedCrust").val();
+                var topping = $("#selectedTopping").val();
+                var drink = $("#selectedDrink").val();
+                var total = $("#grandTotal").val();
+                e.preventDefault();
+                if (email == "") {
+                    navigator.notification.alert("Email must not be empty!", null, "Information", "OK");
+                    return false;
+                } else {
+                    $.post("mail.php", {email: email, selectedCrust: crust, selectedTopping: topping, selectedDrink: drink, grandTotal: total });
+                    navigator.notification.alert("Order Submitted!", null, "Information", "OK");
+                }
             });
         });
 
-        function showAlert() {
-            navigator.notification.alert("Test", null, "hello", "ok");
-        };
 
         $(document).on('pageshow', '#menuPage', function (){
             if(cart){

@@ -151,7 +151,7 @@
                     navigator.notification.alert("Email must not be empty!", null, "Information", "OK");
                     return false;
                 } else {
-                    $.post("mail.php", {email: email, selectedCrust: crust, selectedTopping: topping, selectedDrink: drink, grandTotal: total });
+                    $.post("http://217dev.kirvla.com/mail.php", {email: email, selectedCrust: crust, selectedTopping: topping, selectedDrink: drink, grandTotal: total });
                     navigator.notification.alert("Order Submitted!", null, "Information", "OK");
                 }
             });
